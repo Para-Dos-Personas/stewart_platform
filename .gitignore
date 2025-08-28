@@ -1,0 +1,44 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Python virtual environments
+venv/
+ENV/
+env/
+.venv/
+
+# Processing build files
+*.class
+*.jar
+*.exe
+*.log
+*.tmp
+
+# OS generated files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# VS Code settings
+.vscode/
+
+# 3D printer and slicer temp files
+*.gcode
+*.3mf
+*.bak
+
+# Arduino/ESP32 build files
+*.elf
+*.bin
+*.hex
+
+# Misc
+*.swp
+*.swo
+*.~*
+
+# Personal settings or secrets
+*.env
+secrets.json
