@@ -48,6 +48,9 @@ void loop() {
 // 3. PARSE DATA AND MOVE SERVOS
 // =================================================================
 // This function parses the incoming string (e.g., "A1:90;A2:85;...")
+// =================================================================
+// 3. PARSE DATA AND MOVE SERVOS (CORRECTED)
+// =================================================================
 void parseAndMoveServos(String data) {
   Serial.print("Received: ");
   Serial.println(data);
@@ -57,33 +60,31 @@ void parseAndMoveServos(String data) {
 
   int start = 0;
   while (true) {
-    // Find the end of the current command (marked by ';')
     int end = data.indexOf(';', start);
     if (end == -1) break; // Exit the loop if no more commands are found
 
-    String token = data.substring(start, end); // e.g., "A1:90"
+    String token = data.substring(start, end); // e.g., "A1:60"
     
     if (token.startsWith("A")) {
       int colonIndex = token.indexOf(':');
       if (colonIndex != -1) {
         // Extract the servo number and angle from the token
-        servoIndex = token.substring(1, colonIndex).toInt() - 1; // Convert "A1" to index 0
+        servoIndex = token.substring(1, colonIndex).toInt() - 1; // "A1" -> 0
         angle = token.substring(colonIndex + 1).toInt();
 
-        // Apply correction for servos 2, 4, and 6 (which are at indices 1, 3, 5)
-        // This is needed if they are mounted mirrored to the others.
-        if (servoIndex == 1 || servoIndex == 3 || servoIndex == 5) {
-          angle = 180 - angle;
-        }
+        // ----------------------------------------------------
+        // DELETED: The "if (servoIndex == 1 ...)" block that
+        // inverted the angles has been REMOVED.
+        // The Platform class already calculated the correct angle.
+        // ----------------------------------------------------
         
-        // Ensure the final angle is within the valid 0-180 range
+        // We still constrain the angle as a safety measure
         angle = constrain(angle, 0, 180);
 
-        // Check if the servo index is valid before moving the servo
+        // Check for a valid servo index before moving
         if (servoIndex >= 0 && servoIndex < 6) {
-          // MODIFIED: Use the servo.write() command instead of pwm.setPWM()
           servos[servoIndex].write(angle);
-          Serial.printf("Servo %d (Pin %d) set to %d degrees\n", servoIndex + 1, servoPins[servoIndex], angle);
+          Serial.printf("Servo %d set to %d degrees\n", servoIndex + 1, angle);
         } 
       }
     }

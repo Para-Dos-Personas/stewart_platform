@@ -44,10 +44,13 @@ void setup() {
   // --- Serial Port Setup ---
   println("Available serial ports:");
   println(Serial.list());
-  String portName = "COM8"; // 🔁 IMPORTANT: Replace with your ESP32/Arduino port
+  String portName = "COM5"; // 🔁 IMPORTANT: Replace with your ESP32/Arduino port
   try {
     myPort = new Serial(this, portName, 115200);
     println("✅ Serial port " + portName + " opened successfully.");
+    delay(2500); 
+    myPort.write("A1:60;A2:60;A3:40;A4:60;A5:60;A6:40;\n");
+    println(">>> sent test packet");
   } catch (Exception e) {
     println("❌ Error opening serial port " + portName + ". Check the port name and connection.");
     e.printStackTrace();
@@ -132,7 +135,7 @@ void receive(byte[] data, String ip, int port) {
         handRoll = float(values[1]);
         
         connectionLabel.setText("Hand Control: Active");
-        println(String.format("Received -> Pitch: %.2f, Roll: %.2f", handPitch, handRoll));
+        //println(String.format("Received -> Pitch: %.2f, Roll: %.2f", handPitch, handRoll));
         
       } catch (NumberFormatException e) {
         println("Could not parse UDP message: " + message);
@@ -148,7 +151,7 @@ void receive(byte[] data, String ip, int port) {
 void sendAngles() {
   if (myPort == null) return;
 
-  // MODIFIED: Call the new method to get the remapped 0-180 degree servo angles.
+  // Call the new method to get the remapped 0-180 degree servo angles.
   float[] angles = mPlatform.getServoAngles();
 
   StringBuilder sb = new StringBuilder();
@@ -164,7 +167,9 @@ void sendAngles() {
   }
 
   myPort.write(sb.toString() + "\n");
-  //println("Sent: " + sb.toString()); // Optional: uncomment for debugging
+  
+  // This line will now print the sent data to the Processing console for debugging.
+  println("Sent: " + sb.toString());
 }
 
 
