@@ -1,0 +1,9 @@
+Processing libraries required by `simulation/StewartSimulator.pde`:
+
+- PeasyCam
+- ControlP5
+- UDP (Hypermedia `hypermedia.net` / UDP library)
+- Serial (built into Processing)
+
+Install via Processing IDE: Sketch → Import Library → Add Library… → search for the library name and install.
+If using command-line or a headless setup, install the corresponding library folders into your Processing `libraries/` folder.

@@ -54,6 +54,13 @@ This project implements a 6-DOF Stewart Platform, including simulation, hardware
 - Use `main.py` to bridge BLE data to the ESP32.
 - Use `test.py` to send test servo commands for debugging.
 
+### Gesture Recognition
+- Navigate to `gesture-recognition/`.
+- Install dependencies: `pip install opencv-python mediapipe numpy`.
+- Update `UDP_IP` in `palm_tilt.py` to the receiver machine IP.
+- Run: `python palm_tilt.py`.
+- Press `C` to calibrate neutral position, `Q` to quit.
+
 ## Notes
 
 - Update serial port names and BLE UUIDs as needed for your setup.

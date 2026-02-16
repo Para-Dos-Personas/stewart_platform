@@ -1,0 +1,16 @@
+Arduino / ESP32 libraries referenced in the project:
+
+# Code_ESP32/ServoDriver.ino
+- Adafruit PWM Servo Driver (PCA9685) — search for "Adafruit PWM Servo Driver" in Library Manager
+- Adafruit BusIO (dependency for Adafruit libraries)
+- BluetoothSerial (part of ESP32 Arduino core; no separate install required)
+
+# Code_ESP32/DirectConnection/DirectConnection.ino
+- ESP32Servo (for direct servo control on ESP32)
+
+# Code_Mega/DirectConnectMega/DirectConnectMega.ino
+- Servo (built-in Arduino library)
+
+Installation:
+- Open Arduino IDE → Sketch → Include Library → Manage Libraries… and search/install the names above.
+- For ESP32 board support (required for BluetoothSerial and ESP32-specific libraries): Tools → Board → Boards Manager → install "esp32" by Espressif.
