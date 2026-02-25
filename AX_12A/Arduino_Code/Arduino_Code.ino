@@ -6,8 +6,8 @@ DynamixelShield dxl;
 using namespace ControlTableItem;
 String incomingData = "";
 
-#define MIN_ANGLE 20
-#define MAX_ANGLE 105
+#define MIN_ANGLE 30
+#define MAX_ANGLE 90
 
 int angleToPulse(int angle) {
   return map(angle, 0, 180, 0, 1023);
@@ -16,6 +16,7 @@ int angleToPulse(int angle) {
 void setup() {
   esp_serial.begin(9600);
   dxl.begin(1000000);
+  pinMode(13, OUTPUT);
   dxl.setPortProtocolVersion(DXL_PROTOCOL_VERSION);
   for (uint8_t id = 1; id <= 6; id++) {
     dxl.torqueOff(id);
@@ -32,6 +33,7 @@ void setup() {
 void loop() {
   while (esp_serial.available()) {
     char c = esp_serial.read();
+    digitalWrite(13, !digitalRead(13));
     if (c == '\n') {
       parseAndMoveServos(incomingData);
       incomingData = "";
