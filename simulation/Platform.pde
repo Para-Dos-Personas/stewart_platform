@@ -17,6 +17,7 @@ class Platform {
   private PVector[] q;             // The calculated world-space coordinates of the platform joints after translation and rotation.
   private PVector[] l;             // The calculated vectors for each leg, stretching from a base joint (b_i) to a platform joint (q_i).
   private PVector[] A;             // The calculated world-space coordinates of the end of each servo horn.
+  private float[] alphaLast;
 
   // --- OUTPUT & DIMENSIONS ---
   private float[] alpha;           // (α_i) The calculated angles for each of the 6 servo motors.
@@ -35,11 +36,11 @@ class Platform {
   };
 
   // --- HARDWARE CONSTANTS: PHYSICAL DIMENSIONS (in millimeters) ---
-  private final float SCALE_INITIAL_HEIGHT = 110;
-  private final float SCALE_BASE_RADIUS = 65;
-  private final float SCALE_PLATFORM_RADIUS = 60;
-  private final float SCALE_HORN_LENGTH = 18;
-  private final float SCALE_LEG_LENGTH = 122;
+  private final float SCALE_INITIAL_HEIGHT = 225;
+  private final float SCALE_BASE_RADIUS = 110;
+  private final float SCALE_PLATFORM_RADIUS = 100;
+  private final float SCALE_HORN_LENGTH = 41;
+  private final float SCALE_LEG_LENGTH = 225;
 
   /**
    * Constructor for the Platform class.
@@ -52,6 +53,8 @@ class Platform {
     platformJoint = new PVector[6];
     alpha = new float[6];
     alphaHome = new float[6];
+    alphaLast = new float[6];
+    System.arraycopy(alpha, 0, alphaLast, 0, 6);
     q = new PVector[6];
     l = new PVector[6];
     A = new PVector[6];
@@ -117,10 +120,27 @@ class Platform {
       float L = l[i].magSq() - (legLength * legLength) + (hornLength * hornLength);
       float M = 2 * hornLength * (q[i].z - baseJoint[i].z);
       float N = 2 * hornLength * (cos(beta[i]) * (q[i].x - baseJoint[i].x) + sin(beta[i]) * (q[i].y - baseJoint[i].y));
-      alpha[i] = asin(L / sqrt(M * M + N * N)) - atan2(N, M);
-      A[i].set(hornLength * cos(alpha[i]) * cos(beta[i]) + baseJoint[i].x, 
-               hornLength * cos(alpha[i]) * sin(beta[i]) + baseJoint[i].y, 
-               hornLength * sin(alpha[i]) + baseJoint[i].z);
+      
+      float denom = sqrt(M * M + N * N);
+      if (denom == 0) {
+        // keep last valid
+        alpha[i] = alphaLast[i];
+        continue;
+      }
+      
+      float asinInput = L / denom;
+      
+      // If out of range, IK has no solution — lock to last valid angle
+      if (asinInput < -1.0f || asinInput > 1.0f) {
+        alpha[i] = alphaLast[i];
+      } else {
+        alpha[i] = asin(asinInput) - atan2(N, M);
+        alphaLast[i] = alpha[i]; // save as last valid
+      }
+      
+      A[i].set(hornLength * cos(alpha[i]) * cos(beta[i]) + baseJoint[i].x,
+                hornLength * cos(alpha[i]) * sin(beta[i]) + baseJoint[i].y,
+                hornLength * sin(alpha[i]) + baseJoint[i].z);
     }
   }
   

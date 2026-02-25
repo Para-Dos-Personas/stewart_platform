@@ -124,7 +124,7 @@ void initComms() {
   println("Available serial ports:");
   println(Serial.list());
 
-  String portName = "COM5";  // change if needed
+  String portName = "COM13";  // change if needed
 
   try {
     myPort = new Serial(this, portName, 115200);
