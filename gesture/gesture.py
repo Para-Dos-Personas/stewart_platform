@@ -43,7 +43,6 @@ def weighted_avg(buf):
 
 cap = cv2.VideoCapture(0, cv2.CAP_DSHOW) if platform.system() == "Windows" else cv2.VideoCapture(0)
 
-zero_pitch, zero_roll, zero_yaw = None, None, None
 pitch, roll, yaw = 0, 0, 0
 
 while True:
@@ -83,58 +82,45 @@ while True:
             cv2.putText(frame, f"Roll: {roll:.2f}", (10, 60), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 0, 0), 2)
             cv2.putText(frame, f"Yaw: {yaw:.2f}", (10, 90), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
 
-            if zero_pitch is not None:
-                rel_pitch = (pitch - zero_pitch) / 1.2
-                rel_roll = (roll - zero_roll) / 1.2
-                rel_yaw = yaw - zero_yaw
+            rel_pitch = pitch / 1.2
+            rel_roll = roll / 1.2
+            rel_yaw = yaw
 
-                mapped_pitch = max(0, min(180, 90 + rel_pitch))
-                mapped_roll  = max(0, min(180, 90 + rel_roll))
-                mapped_yaw   = max(0, min(180, 90 + rel_yaw))
+            mapped_pitch = max(0, min(180, 90 + rel_pitch))
+            mapped_roll  = max(0, min(180, 90 + rel_roll))
+            mapped_yaw   = max(0, min(180, 90 + rel_yaw))
 
-                arduino_pitch = int(mapped_pitch - 90)
-                arduino_roll = int(mapped_roll - 90)
+            arduino_pitch = int(mapped_pitch - 90)
+            arduino_roll = int(mapped_roll - 90)
 
-                pitch_buffer.append(arduino_pitch)
-                roll_buffer.append(arduino_roll)
+            pitch_buffer.append(arduino_pitch)
+            roll_buffer.append(arduino_roll)
 
-                smoothed_pitch = weighted_avg(pitch_buffer)
-                smoothed_roll = weighted_avg(roll_buffer)
+            smoothed_pitch = weighted_avg(pitch_buffer)
+            smoothed_roll = weighted_avg(roll_buffer)
 
-                pitch_changed = last_sent_pitch is None or abs(smoothed_pitch - last_sent_pitch) > THRESHOLD
-                roll_changed = last_sent_roll is None or abs(smoothed_roll - last_sent_roll) > THRESHOLD
+            pitch_changed = last_sent_pitch is None or abs(smoothed_pitch - last_sent_pitch) > THRESHOLD
+            roll_changed = last_sent_roll is None or abs(smoothed_roll - last_sent_roll) > THRESHOLD
 
-                if pitch_changed or roll_changed:
-                    message = f"A{smoothed_pitch},{smoothed_roll}*"
-                    sock.sendto(message.encode(), (UDP_IP, UDP_PORT))
-                    last_sent_pitch = smoothed_pitch
-                    last_sent_roll = smoothed_roll
-                    cv2.putText(frame, f"Sent Pitch: {smoothed_pitch}, Roll: {smoothed_roll}", (10, 270), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 255, 255), 2)
-                else:
-                    cv2.putText(frame, f"No change (threshold)", (10, 270), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (100, 100, 100), 2)
+            if pitch_changed or roll_changed:
+                message = f"A{smoothed_pitch},{smoothed_roll}*"
+                sock.sendto(message.encode(), (UDP_IP, UDP_PORT))
+                last_sent_pitch = smoothed_pitch
+                last_sent_roll = smoothed_roll
+                cv2.putText(frame, f"Sent Pitch: {smoothed_pitch}, Roll: {smoothed_roll}", (10, 270), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 255, 255), 2)
+            else:
+                cv2.putText(frame, f"No change (threshold)", (10, 270), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (100, 100, 100), 2)
 
-                cv2.putText(frame, f"Pitch Delta: {rel_pitch:.2f}", (10, 120), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 255), 2)
-                cv2.putText(frame, f"Roll Delta: {rel_roll:.2f}", (10, 150), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 255, 0), 2)
-                cv2.putText(frame, f"Yaw Delta: {rel_yaw:.2f}", (10, 180), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 0, 255), 2)
-                cv2.putText(frame, f"Mapped Yaw: {mapped_yaw:.2f}", (10, 210), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (100, 255, 100), 2)
-                cv2.putText(frame, f"Mapped Roll: {mapped_roll:.2f}", (10, 240), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (100, 255, 100), 2)
-
-    if zero_pitch is None:
-        h, w, _ = frame.shape
-        center_x, center_y = w // 2, h // 2
-        box_size = 100
-        cv2.drawMarker(frame, (center_x, center_y), (200, 200, 200), markerType=cv2.MARKER_CROSS, markerSize=20, thickness=2)
-        cv2.rectangle(frame, (center_x - box_size, center_y - box_size), (center_x + box_size, center_y + box_size), (100, 100, 100), 1)
-        cv2.putText(frame, "Place hand in center & press 'C' to calibrate", (center_x - 180, center_y + box_size + 30),
-                    cv2.FONT_HERSHEY_SIMPLEX, 0.6, (180, 180, 180), 2)
+            cv2.putText(frame, f"Pitch Delta: {rel_pitch:.2f}", (10, 120), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 255), 2)
+            cv2.putText(frame, f"Roll Delta: {rel_roll:.2f}", (10, 150), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 255, 0), 2)
+            cv2.putText(frame, f"Yaw Delta: {rel_yaw:.2f}", (10, 180), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 0, 255), 2)
+            cv2.putText(frame, f"Mapped Yaw: {mapped_yaw:.2f}", (10, 210), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (100, 255, 100), 2)
+            cv2.putText(frame, f"Mapped Roll: {mapped_roll:.2f}", (10, 240), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (100, 255, 100), 2)
 
     cv2.imshow("Palm Tilt Tracker", frame)
     key = cv2.waitKey(1) & 0xFF
     if key == ord('q'):
         break
-    elif key == ord('c'):
-        zero_pitch, zero_roll, zero_yaw = pitch, roll, yaw
-        print("Calibrated!")
 
 cap.release()
 cv2.destroyAllWindows()
