@@ -36,11 +36,11 @@ class Platform {
   };
 
   // --- HARDWARE CONSTANTS: PHYSICAL DIMENSIONS (in millimeters) ---
-  private final float SCALE_INITIAL_HEIGHT = 225;
+  private final float SCALE_INITIAL_HEIGHT = 175;
   private final float SCALE_BASE_RADIUS = 110;
-  private final float SCALE_PLATFORM_RADIUS = 100;
-  private final float SCALE_HORN_LENGTH = 41;
-  private final float SCALE_LEG_LENGTH = 225;
+  private final float SCALE_PLATFORM_RADIUS = 60;
+  private final float SCALE_HORN_LENGTH = 40;
+  private final float SCALE_LEG_LENGTH = 200;
 
   /**
    * Constructor for the Platform class.
